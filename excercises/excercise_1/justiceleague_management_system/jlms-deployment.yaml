@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ms-jlms
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ms-jlms
+    spec:
+      containers:
+      - name: ms-jlms
+        image: gcr.io/kube-lab/jlms:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "50m"
+        ports:
+        - name: http
+          containerPort: 8080
+        env:
+        - name: ENVIRONMENT
+          value: "prod"
+        - name: XMS
+          value: "-Xms512m"
+        - name: XMX
+          value: "-Xmx512m"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: ms-jlms
+  name: ms-jlms
+spec:
+  type: ClusterIP
+  ports:
+  - name: "application"
+    port: 80
+    targetPort: 8080
+  selector:
+    app: ms-jlms
